@@ -1,0 +1,2 @@
+# hashjs
+Lightweight JS framework
