@@ -7,7 +7,11 @@
         root.hash = factory(root.hash);
     }
 }(this, function (hash) {
-    var hash =  function(){};
+    var hash = function(element){
+    	if(element){
+			console.log(element);
+    	}
+    };
 
     hash.prototype.map = function (callback) {
 	    var results = [], i = 0;
@@ -64,6 +68,21 @@
 	          )
 	        )
 	    );
+	};
+
+	hash.prototype.on = function(type, element, callback){
+
+		var events = ["click", "mouseup"];
+
+		if(events.indexOf(type) === -1){
+			return false;
+		}
+
+		var domElement = document.getElementById(element);
+
+		if(callback){
+			callback(domElement);
+		}
 	};
 
 	return new hash();
