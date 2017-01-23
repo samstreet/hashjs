@@ -1,2 +1,2 @@
 # hashjs
-Lightweight JS framework
+Lightweight JS library with AMD capability
