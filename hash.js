@@ -1,89 +1,99 @@
 (function (root, factory) {
     if (typeof define === 'function' && define.amd) {
         // AMD. Register as an anonymous module.
-        define(['hash'], factory);
+        define(['hashjs'], factory);
     } else {
         // Browser globals
-        root.hash = factory(root.hash);
+        root.hash = factory(root.hashjs);
     }
-}(this, function (hash) {
-    var hash = function(element){
-    	if(element){
-			console.log(element);
-    	}
-    };
+}(this, function (hashjs) {
+    var hash = (function() {
 
-    hash.prototype.map = function (callback) {
-	    var results = [], i = 0;
-	    for ( ; i < this.length; i++) {
-	        results.push(callback.call(this, this[i], i));
+    	var hash = function( selector ) {
+			return new hash.fn.init(selector);
+		};
+
+		// set up
+    	hash.fn = hash.prototype = {
+
+    		_version: "0.0.1",
+    		_events: ["click"],
+    		_selector: "",
+
+	    	init: function(selector){
+
+	    		if(!selector)
+	    			return this;
+
+	    		this._selector = selector;
+
+	    		return hash;
+	    	},
+	    	map:function (callback) {
+			    var results = [], i = 0;
+			    for ( ; i < this.length; i++) {
+			        results.push(callback.call(this, this[i], i));
+			    }
+			    return results;
+			},
+			each: function(obj, callback){
+				var value, i = 0,
+		        length = obj.length,
+		        isArray = this.isArrayLike(obj);
+
+		        if (isArray) {
+		            for (; i < length; i++) {
+		                value = callback.call(obj[i], i, obj[i]);
+
+		                if (value === false) {
+		                    break;
+		                }
+		            }
+		        } else {
+		            for (i in obj) {
+		                value = callback.call(obj[i], i, obj[i]);
+
+		                if (value === false) {
+		                    break;
+		                }
+		            }
+		        }
+			},
+			isArrayLike: function(item){
+				return (
+			        Array.isArray(item) || 
+			        (!!item &&
+			          typeof item === "object" &&
+			          typeof (item.length) === "number" && 
+			          (item.length === 0 ||
+			             (item.length > 0 && 
+			             (item.length - 1) in item)
+			          )
+			        )
+			    );
+			},
+			on:function(type, callback){
+				if(this._events.indexOf(type) === -1){
+					return;
+				}
+
+				window.addEventListener(type, callback);
+			}
+	    }; 
+
+    	// methods
+	    hash.map = function(callback){
+	    	return hash.fn.map(callback);
 	    }
-	    return results;
-	};
+	    hash.each = function(obj, callback){
+	    	return hash.fn.each(obj, callback);
+	    };
+	    hash.on = function(type, callback){
+	    	return hash.fn.on(type, callback);
+	    };
 
-	hash.prototype.matchType = function(item){
-		switch(typeof item){
-			case "object":
-				return "object";
-				break;
-			case "array":
-				return "array";
-				break;
-		} 
-	};
+	    return (window.hash = window.$ = hash);
+    });
 
-	hash.prototype.each = function(obj, callback){
-		var value, i = 0,
-        length = obj.length,
-        isArray = this.isArrayLike(obj);
-
-        if (isArray) {
-            for (; i < length; i++) {
-                value = callback.call(obj[i], i, obj[i]);
-
-                if (value === false) {
-                    break;
-                }
-            }
-        } else {
-            for (i in obj) {
-                value = callback.call(obj[i], i, obj[i]);
-
-                if (value === false) {
-                    break;
-                }
-            }
-        }
-	};
-
-	hash.prototype.isArrayLike = function(item){
-		return (
-	        Array.isArray(item) || 
-	        (!!item &&
-	          typeof item === "object" &&
-	          typeof (item.length) === "number" && 
-	          (item.length === 0 ||
-	             (item.length > 0 && 
-	             (item.length - 1) in item)
-	          )
-	        )
-	    );
-	};
-
-	hash.prototype.on = function(type, element, callback){
-
-		var events = ["click", "mouseup"];
-
-		if(events.indexOf(type) === -1){
-			return false;
-		}
-
-		var domElement = document.getElementById(element);
-
-		if(callback){
-			callback(domElement);
-		}
-	};
-
-	return new hash();
+    return hash();
 }));
